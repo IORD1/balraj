@@ -1,10 +1,13 @@
 import { create } from 'zustand'
 import { SCREEN_COUNT, type AgentOutput } from '../config/content'
-import { AGENT_RUN } from '../config/timing'
-import { sleep } from '../lib/easing'
+import { AGENT_RUN, TIMING } from '../config/timing'
+import { clamp, sleep } from '../lib/easing'
+import { flight } from '../lib/flight'
 import { requestAgentRun } from '../services/agent'
 
 export type Phase = 'INTRO' | 'INTERACTIVE' | 'ORBIT'
+/** 'auto' plays the intro flight on the clock; 'scroll' eases the camera towards `flightTarget`. */
+export type FlightMode = 'auto' | 'scroll'
 
 export interface CorridorLabel {
   name: string
@@ -24,6 +27,11 @@ export interface ExperienceState {
   /** Increments each time the entry flash fires (keys the CSS animation). */
   flashKey: number
   corridorLabel: CorridorLabel | null
+  flightMode: FlightMode
+  /** Scrub target along the intro path, in seconds (scroll mode). */
+  flightTarget: number
+  /** The visitor has scrolled at least once this run (dismisses the scroll hint). */
+  flightScrubbed: boolean
   agentRunning: boolean
   /** Increments each time an agent run starts, so the camera orbit restarts. */
   orbitRun: number
@@ -34,10 +42,13 @@ export interface ExperienceState {
   modalOpen: boolean
 
   setSceneReady: () => void
-  hideIntroCard: () => void
-  openDoors: () => void
+  setIntroCardVisible: (visible: boolean) => void
+  setDoorsOpen: (open: boolean) => void
   fireFlash: () => void
   showCorridorLabel: (name: string, subtitle: string) => void
+  setFlightMode: (mode: FlightMode) => void
+  /** Move the scrub target by `seconds` (switches to scroll mode; ignored while an agent runs). */
+  scrubFlight: (seconds: number) => void
   completeIntro: () => void
   endOrbit: () => void
   skipIntro: () => void
@@ -58,6 +69,9 @@ export const useExperience = create<ExperienceState>()((set, get) => ({
   doorsSnap: false,
   flashKey: 0,
   corridorLabel: null,
+  flightMode: 'auto',
+  flightTarget: 0,
+  flightScrubbed: false,
   agentRunning: false,
   orbitRun: 0,
   screenActivations: freshScreens(),
@@ -66,11 +80,32 @@ export const useExperience = create<ExperienceState>()((set, get) => ({
   modalOpen: false,
 
   setSceneReady: () => set({ sceneReady: true }),
-  hideIntroCard: () => set({ introCardVisible: false }),
-  openDoors: () => set({ doorsOpen: true }),
+  setIntroCardVisible: (introCardVisible) => set({ introCardVisible }),
+  setDoorsOpen: (doorsOpen) => set({ doorsOpen, doorsSnap: false }),
   fireFlash: () => set((s) => ({ flashKey: s.flashKey + 1 })),
   showCorridorLabel: (name, subtitle) =>
     set((s) => ({ corridorLabel: { name, subtitle, key: (s.corridorLabel?.key ?? 0) + 1 } })),
+
+  setFlightMode: (flightMode) =>
+    // pausing auto-play holds the camera where it is until the visitor scrolls
+    set(flightMode === 'scroll' ? { flightMode, flightTarget: flight.time } : { flightMode }),
+
+  scrubFlight: (seconds) =>
+    set((s) => {
+      if (!s.sceneReady || s.phase === 'ORBIT' || s.agentRunning || s.modalOpen) return {}
+      // in the agent room only scrolling back does anything: it flies back out
+      if (s.phase === 'INTERACTIVE' && seconds >= 0) return {}
+      const from = s.flightMode === 'scroll' ? s.flightTarget : flight.time
+      const flightTarget = clamp(from + seconds, 0, TIMING.intro_total)
+      const leavingRoom = s.phase === 'INTERACTIVE' && flightTarget < TIMING.intro_total
+      return {
+        flightMode: 'scroll',
+        flightTarget,
+        flightScrubbed: true,
+        ...(leavingRoom ? { phase: 'INTRO', summaryVisible: false, corridorLabel: null } : {}),
+      }
+    }),
+
   completeIntro: () => set((s) => (s.phase === 'INTRO' ? { phase: 'INTERACTIVE', corridorLabel: null } : {})),
   endOrbit: () => set((s) => (s.phase === 'ORBIT' ? { phase: 'INTERACTIVE' } : {})),
 
@@ -81,6 +116,7 @@ export const useExperience = create<ExperienceState>()((set, get) => ({
       doorsSnap: true,
       introCardVisible: false,
       corridorLabel: null,
+      flightTarget: TIMING.intro_total,
     }),
 
   // full reset back to Act 1
@@ -93,6 +129,9 @@ export const useExperience = create<ExperienceState>()((set, get) => ({
       doorsSnap: false,
       introCardVisible: true,
       corridorLabel: null,
+      flightMode: 'auto',
+      flightTarget: 0,
+      flightScrubbed: false,
       screenActivations: freshScreens(),
       agentResult: null,
       summaryVisible: false,
@@ -129,3 +168,8 @@ export const useExperience = create<ExperienceState>()((set, get) => ({
   openModal: () => set({ modalOpen: true }),
   closeModal: () => set({ modalOpen: false }),
 }))
+
+// Dev aid: `__elot()` in the console (or a headless check) returns the current state.
+if (import.meta.env.DEV) {
+  ;(window as unknown as { __elot?: () => ExperienceState }).__elot = () => useExperience.getState()
+}

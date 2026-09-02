@@ -72,6 +72,8 @@ export const PANELS = {
   baseEmissive: 0.35,
   /** Panel pulses (and its corridor label shows) once the camera passes zPos + this. */
   triggerOffset: 3,
+  /** Re-armed once the camera backs out this far behind the trigger, so a scrubbed flight pulses it again. */
+  rearmOffset: 2,
   pulseSeconds: 1.4,
 } as const
 

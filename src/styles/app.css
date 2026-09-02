@@ -44,16 +44,46 @@ button { font: inherit; }
 #flash.fire { animation: flashOut 0.5s ease-out forwards; }
 @keyframes flashOut { 0% { opacity: 0.85; } 100% { opacity: 0; } }
 
-/* ---------- skip ---------- */
-#skip-intro {
+/* ---------- flight controls: auto mode, skip, scroll hint, progress ---------- */
+#flight-controls {
   position: fixed; top: 22px; right: 26px; z-index: 110;
+  display: flex; gap: 8px;
+}
+#skip-intro, #flight-auto {
   font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.18em;
   text-transform: uppercase; color: rgba(244,237,228,0.5);
   border: 1px solid rgba(232,128,74,0.35); padding: 8px 14px;
   background: rgba(10,10,15,0.6); cursor: pointer;
-  transition: color 0.25s, border-color 0.25s;
+  transition: color 0.25s, border-color 0.25s, background 0.25s;
 }
-#skip-intro:hover { color: #ff9a5c; border-color: #e8804a; }
+#skip-intro:hover, #flight-auto:hover { color: #ff9a5c; border-color: #e8804a; }
+#flight-auto { display: inline-flex; align-items: center; gap: 9px; }
+#flight-auto .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(244,237,228,0.3); transition: background 0.25s, box-shadow 0.25s;
+}
+#flight-auto.on { color: #ff9a5c; border-color: rgba(232,128,74,0.8); background: rgba(232,128,74,0.1); }
+#flight-auto.on .dot { background: #ff9a5c; box-shadow: 0 0 8px #ff9a5c; animation: dotPulse 1.6s ease-in-out infinite; }
+@keyframes dotPulse { 50% { opacity: 0.35; } }
+#flight-hint {
+  position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%); z-index: 110;
+  display: flex; align-items: center; gap: 12px; pointer-events: none;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.24em;
+  text-transform: uppercase; color: rgba(244,237,228,0.55);
+  transition: opacity 0.6s ease-in-out;
+}
+#flight-hint.seen { opacity: 0; }
+#flight-hint .glyph { font-size: 14px; color: #ff9a5c; animation: hintBob 1.6s ease-in-out infinite; }
+@keyframes hintBob { 50% { transform: translateY(3px); } }
+#flight-progress {
+  position: fixed; left: 0; right: 0; bottom: 0; height: 2px; z-index: 110;
+  background: rgba(244,237,228,0.08); pointer-events: none;
+}
+#flight-progress i {
+  display: block; height: 100%; background: #e8804a;
+  transform-origin: left center; transform: scaleX(var(--flight, 0));
+  box-shadow: 0 0 6px rgba(232,128,74,0.6);
+}
 
 /* ---------- Act 4 corridor label ---------- */
 #hud-corridor-label {

@@ -73,7 +73,8 @@ src/
   scene/      react-three-fiber scene
     Experience.tsx   <Canvas>, colour/fog/tone-mapping
     World.tsx        scene composition; every shell element is an asset <Slot>
-    CameraRig.tsx    keyframed intro flight, orbit during a run, time-based intro events
+    CameraRig.tsx    intro flight along the keyframed path (auto-play or scroll-scrubbed),
+                     orbit during a run, position-based intro events
                      (open the page with ?cam=x,y,z&look=x,y,z to park the camera anywhere)
     EntrancePortal.tsx  pilasters/lintel/sill around the door and the wall behind the glazing
     Lighting.tsx     all lights (kept out of the shells so models can be swapped freely)
@@ -81,12 +82,36 @@ src/
     procedural/      placeholder geometry for each slot (sky, ground, city, hero building,
                      corridor, agent room)
   lib/        canvas texture drawing (panels, screens, sign), camera path, geometry helpers
-  hud/        DOM overlay: intro card, flash, corridor label, main HUD, summary, modal
+  hud/        DOM overlay: intro card, flight controls (auto mode / skip / scroll hint /
+              progress line), flash, corridor label, main HUD, summary, modal
   styles/     app.css (ported 1:1) and fonts.css (fonts extracted from the bundle)
 public/
   fonts/      Fraunces, Inter, JetBrains Mono (woff2)
   models/     put .glb files here
 ```
+
+## Moving through the flight
+
+The intro flight can be driven two ways, switchable at any time with the **Auto mode**
+button at the top right:
+
+- **Auto mode** (the default) plays the flight on the clock, as the original demo did.
+- **Scroll** — the mouse wheel, a finger drag or the arrow / page keys move a target along
+  the camera path and the camera eases towards it, so the flight can be walked back and
+  forth by hand. The first scroll switches auto mode off; pressing the button resumes it
+  from wherever the camera is. A thin amber line along the bottom edge shows the position.
+
+Everything the flight triggers — the title card, the doors, the entry flash, the corridor
+labels, arrival in the agent room — is derived from the position on the path, so scrolling
+back closes the doors and brings the title card back, and scrolling out of the agent room
+flies back down the corridor (the agent HUD returns when you reach the room again). Input
+is ignored while an agent run is in progress and while the output modal is open. Tuning
+lives in `SCROLL` in `src/config/timing.ts`.
+
+The five wall screens in the agent room show a standby picture (stage name, "Awaiting
+brief") until a run fills them one by one; each keeps a single material for its whole life
+and only the texture is swapped. In development, `__elot()` in the browser console returns
+the current experience state.
 
 ## Adding your 3D assets
 

@@ -1,3 +1,4 @@
+import { SCREEN_STAGES } from '../../config/content'
 import { FONTS, HEX } from '../../config/theme'
 import { ctx2d, makeCanvas, setLetterSpacing, wrapText } from './canvas'
 
@@ -17,6 +18,51 @@ function screenFrame(ctx: CanvasRenderingContext2D, title: string) {
   ctx.strokeStyle = 'rgba(232,128,74,0.35)'
   ctx.lineWidth = 1
   ctx.beginPath(); ctx.moveTo(52, 104); ctx.lineTo(972, 104); ctx.stroke()
+}
+
+/**
+ * What a wall screen shows before (and between) runs: a dim frame, faint scanlines and the
+ * stage it will report on, so the dark rectangles read as displays waiting for a brief.
+ */
+export function createStandbyCanvas(i: number): HTMLCanvasElement {
+  const c = makeCanvas(1024, 640)
+  const ctx = ctx2d(c)
+  ctx.fillStyle = HEX.bg
+  ctx.fillRect(0, 0, 1024, 640)
+  ctx.fillStyle = 'rgba(244,237,228,0.045)'
+  for (let y = 0; y < 640; y += 6) ctx.fillRect(0, y, 1024, 2)
+  ctx.strokeStyle = 'rgba(232,128,74,0.5)'
+  ctx.lineWidth = 3
+  ctx.strokeRect(16, 16, 992, 608)
+
+  ctx.font = '400 24px ' + FONTS.mono
+  ctx.textBaseline = 'top'
+  setLetterSpacing(ctx, '6px')
+  ctx.fillStyle = 'rgba(232,128,74,0.75)'
+  ctx.textAlign = 'left'
+  ctx.fillText('SCREEN 0' + (i + 1), 52, 52)
+  ctx.textAlign = 'right'
+  ctx.fillText('STANDBY', 972, 52)
+  ctx.strokeStyle = 'rgba(232,128,74,0.3)'
+  ctx.lineWidth = 1
+  ctx.beginPath(); ctx.moveTo(52, 104); ctx.lineTo(972, 104); ctx.stroke()
+
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillStyle = HEX.teal
+  ctx.font = '400 20px ' + FONTS.mono
+  setLetterSpacing(ctx, '10px')
+  ctx.fillText('0' + (i + 1) + ' · ' + (SCREEN_STAGES[i] ?? ''), 512, 318)
+  ctx.fillStyle = HEX.dim
+  ctx.font = '400 30px ' + FONTS.serif
+  setLetterSpacing(ctx, '4px')
+  ctx.fillText('Awaiting brief', 512, 372)
+  setLetterSpacing(ctx, '0px')
+
+  // a slow "cursor" bar under the caption
+  ctx.fillStyle = 'rgba(232,128,74,0.55)'
+  ctx.fillRect(482, 412, 60, 3)
+  return c
 }
 
 /**

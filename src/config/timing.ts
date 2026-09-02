@@ -32,7 +32,24 @@ export const AGENT_RUN = {
 } as const
 
 export const CORRIDOR_LABEL_HOLD_MS = 1900
-export const SCREEN_SETTLE = { from: 1.2, to: 0.4, seconds: 0.9 } as const
+/** Wall-screen glow: flash on activation, settle to a steady glow; `standby` is the unlit look. */
+export const SCREEN_SETTLE = { from: 1.2, to: 0.5, seconds: 0.9, standby: 0.3 } as const
+
+/**
+ * Scroll-driven flight. Wheel, touch and arrow keys move a target along the camera path and
+ * the camera eases towards it, so the flight can be scrubbed back and forth by hand;
+ * "auto mode" plays it on the clock instead.
+ */
+export const SCROLL = {
+  /** Seconds of flight per pixel of wheel travel (one mouse notch ≈ 100 px ≈ 0.8 s). */
+  secondsPerPixel: 0.008,
+  /** A finger drag covers less distance than a wheel for the same intent. */
+  touchSecondsPerPixel: 0.02,
+  /** Arrow / page keys step this many seconds. */
+  keyStep: 1.5,
+  /** Easing rate of the camera towards the scrub target, per second (higher = snappier). */
+  ease: 4.5,
+} as const
 
 export type Vec3 = [number, number, number]
 export interface CameraKeyframe { t: number; pos: Vec3; look: Vec3 }

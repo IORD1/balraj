@@ -10,25 +10,35 @@ import { easeInOutCubic } from '../lib/easing'
 import { useExperience } from '../state/experience'
 import { AssetErrorBoundary, computeFit } from './AssetSlot'
 
-/** Calls `apply` every frame with the eased open amount (0 closed → 1 open). */
+/**
+ * Calls `apply` every frame with the eased open amount (0 closed → 1 open). The leaves travel
+ * from wherever they are whenever `doorsOpen` flips, so a scrubbed flight closes them again.
+ */
 function useDoorAnimation(apply: (eased: number) => void) {
   const runSeen = useRef(-1)
-  const openedAt = useRef<number | null>(null)
+  const anim = useRef({ open: false, from: 0, since: 0, p: 0 })
   useFrame(({ clock }) => {
     const s = useExperience.getState()
+    const t = clock.elapsedTime
+    const a = anim.current
     if (s.runId !== runSeen.current) {
       runSeen.current = s.runId
-      openedAt.current = null
+      a.open = false
+      a.from = 0
+      a.since = t
+      a.p = 0
     }
-    let p = 0
-    if (s.doorsOpen) {
-      if (s.doorsSnap) p = 1
-      else {
-        openedAt.current ??= clock.elapsedTime
-        p = Math.min(1, (clock.elapsedTime - openedAt.current) / TIMING.act3_doorsOpen)
-      }
+    if (s.doorsOpen !== a.open) {
+      a.open = s.doorsOpen
+      a.from = a.p
+      a.since = t
     }
-    apply(easeInOutCubic(p))
+    if (a.open && s.doorsSnap) a.p = 1
+    else {
+      const travelled = (t - a.since) / TIMING.act3_doorsOpen
+      a.p = a.open ? Math.min(1, a.from + travelled) : Math.max(0, a.from - travelled)
+    }
+    apply(easeInOutCubic(a.p))
   })
 }
 

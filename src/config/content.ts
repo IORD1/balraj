@@ -37,6 +37,8 @@ export const FRAMEWORK_PANELS: FrameworkPanel[] = [
 
 /** Number of wall screens in the agent room (one per closed wall of the hexagon). */
 export const SCREEN_COUNT = 5
+/** Stage each screen reports on; shown on the screen while it waits for a run. */
+export const SCREEN_STAGES = ['DISCOVER', 'DIAGNOSE', 'DEFINE', 'DESIGN', 'DELIVER'] as const
 
 export interface AgentStat { value: string; label: string }
 export interface AgentSection { title: string; body: string }

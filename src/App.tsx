@@ -1,9 +1,9 @@
 import { CorridorLabel } from './hud/CorridorLabel'
 import { Flash } from './hud/Flash'
+import { FlightControls } from './hud/FlightControls'
 import { IntroCard } from './hud/IntroCard'
 import { MainHud } from './hud/MainHud'
 import { OutputModal } from './hud/OutputModal'
-import { SkipIntro } from './hud/SkipIntro'
 import { SummaryPanel } from './hud/SummaryPanel'
 import { useFontsReady } from './lib/useFontsReady'
 import { Experience } from './scene/Experience'
@@ -25,7 +25,7 @@ export default function App() {
       <MainHud />
       <SummaryPanel />
       <OutputModal />
-      <SkipIntro />
+      <FlightControls />
     </div>
   )
 }

@@ -13,7 +13,8 @@ const panelZ = (i: number) => PANELS.firstZ - i * PANELS.spacing
 
 /**
  * Eight framework panels along the corridor walls. Each pulses (and posts its
- * name to the HUD) the first time the intro camera passes it.
+ * name to the HUD) when the intro camera passes it; backing out past a panel
+ * re-arms it, so a scrubbed flight pulses it again on the next pass.
  */
 export function FrameworkPanels() {
   const textures = useDisposable(() => FRAMEWORK_PANELS.map((fw) => makeTexture(createPanelCanvas(fw))), [])
@@ -39,6 +40,8 @@ export function FrameworkPanels() {
         pulsed.current[i] = true
         pulseAt.current[i] = t
         s.showCorridorLabel(fw.name, fw.subtitle)
+      } else if (pulsed.current[i] && camera.position.z > triggerZ + PANELS.rearmOffset) {
+        pulsed.current[i] = false
       }
       const mat = materials.current[i]
       if (!mat || pulseAt.current[i] < 0) return

@@ -25,6 +25,26 @@ export const DOOR = {
   z: -21.75,
   /** Height a door model is scaled to (the doorway cut in the building is 3.8 tall). */
   height: 3.9,
+  /** Width of the door frame at that height (door.glb is 1.5 wide for 2.1 tall). */
+  width: 2.8,
+} as const
+
+/**
+ * Portal built around the door so it reads as part of the façade (the doorway cut in the
+ * glazing is a raw edge), plus the wall that closes the corridor mouth behind the glazing.
+ */
+export const ENTRANCE = {
+  /** Pilaster width either side of the door frame. */
+  jamb: 0.35,
+  /** Beam height above the door frame. */
+  lintel: 0.5,
+  /** Portal depth, and how far its face stands proud of the glazing plane (DOOR.z). */
+  depth: 0.5,
+  protrude: 0.35,
+  /** Step under the door. */
+  sill: 0.06,
+  /** Wall just inside the glazing; the door frame overlaps its opening by `overlap` on each edge. */
+  wall: { width: 8.2, height: 7, z: -21.97, overlap: 0.05 },
 } as const
 
 export const HERO_BUILDING = {

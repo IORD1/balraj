@@ -84,7 +84,7 @@ export const ASSETS: Record<AssetKey, AssetSlot | null> = {
     url: '/models/door.glb',
     position: [0, 0, DOOR.z],
     fit: { axis: 'y', size: DOOR.height },
-    doors: { mode: 'swing', angle: 1.9 },
+    doors: { mode: 'swing', angle: 1.65 }, // ≈95°: leaves stay within the portal's reveal
   },
 
   // 3d-assests/coridor.zip (Corridor.fbx) → public/models/corridor.glb (tools/convert/corridor.py).

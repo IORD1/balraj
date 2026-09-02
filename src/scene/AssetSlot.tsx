@@ -52,6 +52,15 @@ export function SceneAsset({ url, position, rotation, scale, fit }: AssetSlotCon
 
   // Bounding box of the raw model, in its own frame.
   const box = useMemo(() => new THREE.Box3().setFromObject(scene), [scene])
+  // Single-sided walls (backface-culled buildings) would otherwise let the moonlight straight
+  // through: three only draws a material's back faces into the shadow map by default.
+  useMemo(() => {
+    scene.traverse((o) => {
+      const mesh = o as THREE.Mesh
+      if (!mesh.isMesh) return
+      for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) m.shadowSide = THREE.DoubleSide
+    })
+  }, [scene])
   const fitted = useMemo(() => computeFit(box, fit), [box, fit])
 
   return (

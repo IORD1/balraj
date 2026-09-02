@@ -13,9 +13,18 @@ export function Ground() {
   }, [])
   return (
     <>
+      {/* Pushed back in the depth buffer: the agent-room floor and model floors sit exactly
+          on y = 0 too, and coplanar surfaces z-fight (the floor shimmers as the camera moves). */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[400, 400]} />
-        <meshStandardMaterial color={lc(0x151519)} roughness={0.9} metalness={0.1} />
+        <meshStandardMaterial
+          color={lc(0x151519)}
+          roughness={0.9}
+          metalness={0.1}
+          polygonOffset
+          polygonOffsetFactor={1}
+          polygonOffsetUnits={1}
+        />
       </mesh>
       <gridHelper ref={grid} args={[400, 80, lc(COLORS.structureDark), lc(COLORS.structureDark)]} position={[0, 0.01, 0]} />
     </>

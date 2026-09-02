@@ -2,6 +2,7 @@ import { AgentForm } from './AgentForm'
 import { AgentScreens } from './AgentScreens'
 import { Slot } from './AssetSlot'
 import { Doors } from './Doors'
+import { EntrancePortal } from './EntrancePortal'
 import { FrameworkPanels } from './FrameworkPanels'
 import { Lighting } from './Lighting'
 import { Particles } from './Particles'
@@ -28,6 +29,7 @@ export function World() {
       <Slot name="heroBuilding" fallback={<HeroBuilding />} />
       <HeroSign />
       <Doors />
+      <EntrancePortal />
       <Slot name="corridor" fallback={<Corridor />} />
       <FrameworkPanels />
       <Slot name="agentRoom" fallback={<AgentRoom />} />

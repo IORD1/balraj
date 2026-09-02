@@ -45,7 +45,7 @@ export const CAMERA_KEYFRAMES: CameraKeyframe[] = [
   { t: 11.0, pos: [0, 8, 0], look: [0, 4, -20] },
   // approach aimed at the middle of the doorway (door is DOOR.height tall, centred on x = 0)
   { t: 13.5, pos: [0, 3, -16], look: [0, 2, -22] },
-  { t: 14.5, pos: [0, 2, -22], look: [0, 2, -30] },
+  { t: 14.5, pos: [0, 2, -22.15], look: [0, 2, -30] }, // just past the corridor model's front plane (z = -22)
   { t: 15.0, pos: [0, 2, -24], look: [0, 2.2, -40] },
   { t: 15.5, pos: [0, 2.1, -26], look: [0, 2.5, -50] },
   { t: 18.5, pos: [0, 2.8, -42], look: [0, 3, -60] },

@@ -74,6 +74,8 @@ src/
     Experience.tsx   <Canvas>, colour/fog/tone-mapping
     World.tsx        scene composition; every shell element is an asset <Slot>
     CameraRig.tsx    keyframed intro flight, orbit during a run, time-based intro events
+                     (open the page with ?cam=x,y,z&look=x,y,z to park the camera anywhere)
+    EntrancePortal.tsx  pilasters/lintel/sill around the door and the wall behind the glazing
     Lighting.tsx     all lights (kept out of the shells so models can be swapped freely)
     Doors / FrameworkPanels / AgentScreens / AgentForm / Particles — animated, content-driven parts
     procedural/      placeholder geometry for each slot (sky, ground, city, hero building,
@@ -125,6 +127,12 @@ Slots currently filled from `3d-assests/` (converted with `tools/convert/`, see
 `fit.anchor` is the easiest way to place a model whose origin is not where the scene
 needs it: give the model-space point (e.g. its entrance floor centre) and it lands on the
 slot `position`. The building and corridor use it with their origins baked at the entrance.
+
+The door is tied into whatever building model is in use by `EntrancePortal` (sized from
+`DOOR` and `ENTRANCE` in `src/config/layout.ts`): a portal on the façade around the door
+frame, and a wall just inside the glazing that closes the corridor mouth so the door sits in
+a wall when seen from the corridor. To inspect how a model sits, open the page with
+`?cam=x,y,z&look=x,y,z` (e.g. `?cam=0,2,-32&look=0,2,-21.75` looks back at the entrance).
 
 The agent-room head ("AI Head – Demystifying Artificial Intelligence" by Brandon Baldwin)
 is a view-only Sketchfab listing with no download and no licence, so it has to be obtained
